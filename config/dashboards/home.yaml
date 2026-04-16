@@ -16,9 +16,9 @@ views:
     dense_section_placement: true
     sections:
 
-      # ── Status (half-width) ──
+      # ── Status (quarter-width) — chips only, kept short ──
       - type: grid
-        column_span: 2
+        column_span: 1
         cards:
           - type: heading
             heading: Status
@@ -81,23 +81,9 @@ views:
                   entity: sensor.master_bedroom_battery
                   icon_color: red
 
-      # ── Weather forecast (half-width, same row as Status) ──
+      # ── Quick actions (half-width, 4 buttons in 2×2) ──
       - type: grid
         column_span: 2
-        cards:
-          - type: heading
-            heading: Forecast
-            icon: mdi:weather-partly-cloudy
-            heading_style: title
-          - type: weather-forecast
-            entity: weather.forecast_home
-            forecast_type: daily
-            show_forecast: true
-            show_current: false
-
-      # ── Quick actions (full width) ──
-      - type: grid
-        column_span: 4
         cards:
           - type: heading
             heading: Quick actions
@@ -109,7 +95,7 @@ views:
             secondary: AL on, sleep off
             icon: mdi:weather-sunny
             icon_color: amber
-            grid_options: { columns: 3 }
+            grid_options: { columns: 6 }
             tap_action:
               action: perform-action
               perform_action: switch.turn_on
@@ -132,7 +118,7 @@ views:
             secondary: Dim lights
             icon: mdi:movie-open
             icon_color: purple
-            grid_options: { columns: 3 }
+            grid_options: { columns: 6 }
             tap_action:
               action: perform-action
               perform_action: light.turn_on
@@ -151,7 +137,7 @@ views:
             secondary: Sleep mode on
             icon: mdi:bed
             icon_color: indigo
-            grid_options: { columns: 3 }
+            grid_options: { columns: 6 }
             tap_action:
               action: perform-action
               perform_action: switch.turn_on
@@ -166,7 +152,7 @@ views:
             secondary: Every light
             icon: mdi:lightbulb-off-outline
             icon_color: grey
-            grid_options: { columns: 3 }
+            grid_options: { columns: 6 }
             tap_action:
               action: perform-action
               perform_action: light.turn_off
@@ -177,6 +163,20 @@ views:
                   - light.office_light_local
                   - light.lightstrip
                   - light.living_room
+
+      # ── Forecast (quarter-width, next to Quick actions) ──
+      - type: grid
+        column_span: 1
+        cards:
+          - type: heading
+            heading: Forecast
+            icon: mdi:weather-partly-cloudy
+            heading_style: title
+          - type: weather-forecast
+            entity: weather.forecast_home
+            forecast_type: daily
+            show_forecast: true
+            show_current: false
 
       # ── Living Room (half-width) ──
       - type: grid
