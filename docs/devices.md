@@ -83,7 +83,10 @@ Auto-detected by xZetsubou's `auto_configure_device`. Provided here for referenc
 
 ## Light groups
 
-| Group entity | Members |
-|---|---|
-| `light.kitchen_light` | `light.kitchen_bulb_2_local`, `light.kitchen_bulb_3_local`, `light.kitchen_bulb_4_local` |
-| `light.pasillo` | `light.pasillo_1_local`, `light.pasillo_2_local` |
+| Group entity | Members | Why the group exists |
+|---|---|---|
+| `light.kitchen_light` | `light.kitchen_bulb_2_local`, `light.kitchen_bulb_3_local`, `light.kitchen_bulb_4_local` | Stable zone address for Adaptive Lighting and dashboards — survives bulb swaps |
+| `light.pasillo` | `light.pasillo_1_local`, `light.pasillo_2_local` | Same rationale |
+| `light.living_room` | `light.living_light_1`, `light.living_light_2`, `light.living_light_3` | The three IKEA bulbs share a wall switch so are always synchronised; one entity matches the physical reality |
+
+All three groups are regular HA light groups (config entries with `domain: group`, subtype `light`). Dashboards and automations should target these groups rather than individual bulbs.

@@ -83,6 +83,8 @@ For each of Kitchen / Pasillo / Office:
 |---|---|---|---|
 | `xZetsubou/hass-localtuya` | 2025.11.0 | Integration | Tuya local (v3.5 capable) |
 | `basnijholt/adaptive-lighting` | 1.30.1 | Integration | Circadian lighting |
+| `piitaya/lovelace-mushroom` | 5.1.1 | Plugin (frontend) | Mushroom card pack — used throughout the Home and System dashboards for compact, modern cards (`custom:mushroom-*`) |
+| `piitaya/lovelace-mushroom-themes` | 0.0.11 | Theme | Companion theme pack (installed; not currently the active theme) |
 | HACS itself | current | — | Integration manager |
 
 ## Add-ons

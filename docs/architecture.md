@@ -41,19 +41,21 @@ Barcelona, Spain. `Europe/Madrid` timezone. `EUR` currency. `km`/`°C`/`m/s` uni
 The lighting stack uses a three-layer pattern that makes migration and maintenance easy:
 
 ```
-Adaptive Lighting switch  →  Light group (HA)  →  Individual bulbs (LocalTuya)
-────────────────────────     ───────────────     ────────────────────────────
-switch.adaptive_lighting_*   light.kitchen_light   light.kitchen_bulb_{2,3,4}_local
-                             light.pasillo         light.pasillo_{1,2}_local
-                             (direct target)       light.office_light_local
+Adaptive Lighting switch  →  Light group (HA)  →  Individual bulbs
+────────────────────────     ───────────────     ──────────────────────────────────
+switch.adaptive_lighting_*   light.kitchen_light   light.kitchen_bulb_{2,3,4}_local  (LocalTuya v3.5)
+                             light.pasillo         light.pasillo_{1,2}_local         (LocalTuya v3.5)
+                             (direct target)       light.office_light_local          (LocalTuya v3.5)
+                             light.living_room     light.living_light_{1,2,3}        (IKEA TRADFRI via ZHA)
+                                                   └── no AL — wall-switch controlled
 ```
 
 Why this layering:
 - **Adaptive Lighting switches** decide what CT/brightness to apply based on sun position.
 - **Light groups** are the stable "zone address" — if individual bulbs are swapped or re-added, AL's target doesn't change.
-- **Individual local bulbs** do the actual work over Tuya protocol v3.5.
+- **Individual bulbs** do the actual work, over Tuya protocol v3.5 (Kitchen/Pasillo/Office) or Zigbee (Living Room).
 
-Office has no group because it's a single bulb; AL targets `light.office_light_local` directly.
+Office has no group because it's a single bulb; AL targets `light.office_light_local` directly. Living Room has a group (`light.living_room`) but no Adaptive Lighting because the household uses the physical wall switch to kill power — AL would have nothing to adapt while the bulbs are unavailable, and when the switch is back on the bulbs come up at their firmware defaults (outside our control until further config).
 
 ### Why Adaptive Lighting, not manual automations
 

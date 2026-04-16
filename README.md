@@ -21,16 +21,25 @@ This repo is **not** a full disaster-recovery backup. Home Assistant's automatic
 ```
 homeassistant/
 ├── README.md                  — you are here
+├── CONTRIBUTING.md            — commit conventions, ADR/runbook templates
 ├── docs/
 │   ├── architecture.md        — topology, protocols, zone model
 │   ├── devices.md             — full device inventory with IDs/IPs
 │   ├── integrations.md        — integration list, purpose, config entries
+│   ├── dashboards.md          — Home + System dashboards overview
 │   ├── runbooks/              — how-to guides for operations
 │   ├── decisions/             — ADR-style "why" records
 │   └── automations/           — reference copies of UI-created automations
-├── config/                    — tracked YAML snapshots
+├── config/
+│   ├── configuration.yaml     — main HA config
+│   ├── {automations,scripts,scenes}.yaml — empty stubs (UI-managed via .storage/)
+│   ├── secrets.yaml.example   — template only
+│   └── dashboards/
+│       ├── home.yaml          — Home dashboard YAML source
+│       └── system.yaml        — System dashboard YAML source
 └── scripts/
-    └── pull-config.sh         — SSH + copy tracked files from Pi
+    ├── pull-config.sh         — SSH + copy tracked YAML from Pi
+    └── apply-dashboard.sh     — push a dashboard YAML to the Pi via WebSocket
 ```
 
 For conventions, secret-hygiene checks, and ADR/runbook templates, see [CONTRIBUTING.md](CONTRIBUTING.md).
@@ -42,11 +51,13 @@ For conventions, secret-hygiene checks, and ADR/runbook templates, see [CONTRIBU
 | Understand what's where | [docs/architecture.md](docs/architecture.md) |
 | Find a device by name, IP, or protocol | [docs/devices.md](docs/devices.md) |
 | Know what's installed and why | [docs/integrations.md](docs/integrations.md) |
+| Edit or understand the dashboards | [docs/dashboards.md](docs/dashboards.md) |
 | Add a new Tuya bulb | [docs/runbooks/add-tuya-device.md](docs/runbooks/add-tuya-device.md) |
 | Renew the Tuya IoT Cloud trial | [docs/runbooks/renew-tuya-trial.md](docs/runbooks/renew-tuya-trial.md) |
 | Recover from an SD-card failure | [docs/runbooks/recover-from-sd-death.md](docs/runbooks/recover-from-sd-death.md) |
 | Understand the backup strategy | [docs/runbooks/backup-strategy.md](docs/runbooks/backup-strategy.md) |
 | Know why LocalTuya, not cloud | [docs/decisions/001-localtuya-xzetsubou.md](docs/decisions/001-localtuya-xzetsubou.md) |
+| See what the door-alert automation does | [docs/automations/front-door-alerts-away.md](docs/automations/front-door-alerts-away.md) |
 
 ## Access
 
