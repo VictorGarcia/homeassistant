@@ -26,7 +26,8 @@ homeassistant/
 │   ├── devices.md             — full device inventory with IDs/IPs
 │   ├── integrations.md        — integration list, purpose, config entries
 │   ├── runbooks/              — how-to guides for operations
-│   └── decisions/             — ADR-style "why" records
+│   ├── decisions/             — ADR-style "why" records
+│   └── automations/           — reference copies of UI-created automations
 ├── config/                    — tracked YAML snapshots
 └── scripts/
     └── pull-config.sh         — SSH + copy tracked files from Pi
