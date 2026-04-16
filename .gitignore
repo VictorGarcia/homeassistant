@@ -9,6 +9,7 @@
 !/.gitignore
 !/.gitattributes
 !/README.md
+!/CONTRIBUTING.md
 !/docs/
 !/docs/**
 !/config/

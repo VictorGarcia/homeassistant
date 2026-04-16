@@ -32,6 +32,8 @@ homeassistant/
     └── pull-config.sh         — SSH + copy tracked files from Pi
 ```
 
+For conventions, secret-hygiene checks, and ADR/runbook templates, see [CONTRIBUTING.md](CONTRIBUTING.md).
+
 ## Quick navigation
 
 | I need to… | Go to |
