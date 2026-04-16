@@ -139,3 +139,107 @@ Realistic end-state for the whole flat: **~€200–260 hardware**, which is wel
 - SONOFF ZBDongle-E — https://sonoff.tech/product/gateway-and-sensors/sonoff-zbdongle-e/
 - [ADR-003](003-wall-switch-pattern.md) — the wall-switch-kills-power pattern this decision aims to supersede
 - [ADR-002](002-adaptive-lighting.md) — AL becomes *simpler* once bulbs are always-powered (initial_transition becomes less load-bearing)
+
+---
+
+## Appendix A — Multi-switch wiring cookbook
+
+How the other switches in 2-way (kitchen) and 3-way (pasillo) circuits actually get wired when only one relay is installed.
+
+### The mental model
+
+The relay is the **brain** — it holds the load (the wire going to the bulb). Physical switches become **buttons** whose only job is to tell the relay "someone just pressed me." Every switch needs a signal path back to one of the relay's input terminals (typically labelled `SW`, `SW1`, `SW2`, `L1`, or `L2` depending on model).
+
+```
+                    ┌──────────────┐
+  [Switch A] ──────▶│              │
+                    │   Relay      │────▶ [Bulb(s)]
+  [Switch B] ──────▶│   (brain)    │
+                    │              │
+  [Switch C] ──────▶│              │
+                    └──────────────┘
+```
+
+The relay is physically installed in **one** of the switch boxes — typically the one closest to the bulb's wiring and with a confirmed neutral wire. The other switches' wires get re-routed (at their own boxes) so they feed signals back to the relay's input terminals.
+
+### The good news: existing traveler wires are reusable
+
+In a traditional 2-way or 3-way switch installation, the switches are already connected to each other by "traveler" wires — 2 or 3 conductors running between boxes *inside the walls*. They exist to pass on/off state between switches. **For smart conversion, those same travelers become the signal path back to the relay** — no new wire needs to be pulled through walls in most cases.
+
+This is why the pasillo 3-way isn't a nightmare: the cable-between-boxes already exists and can be repurposed.
+
+### Scenario 1 — Single switch → single circuit (Living Room, Office)
+
+Trivial. ~15 minutes of DIY per location.
+
+1. Flip breaker. Remove switch plate. Confirm neutral wire (blue, tied off in the box).
+2. Install relay inside the box.
+3. Wire:
+   - Line (brown/black) → relay's `L` input
+   - Neutral (blue) → relay's `N` input
+   - Load (wire going to the bulb) → relay's `O` output
+   - Switch contacts → relay's `SW` input
+4. Close up, breaker on, pair to ZHA (or WiFi for Shelly).
+
+### Scenario 2 — Two switches → single circuit (Kitchen)
+
+```
+        ┌─── Kitchen ──────────────┐
+        │                          │
+        │  [Switch 1]══traveler══[Switch 2]
+        │      │                   │
+        │    [Relay]                     
+        │      │                          
+        │      └── Load ──▶ bulbs        
+        └──────────────────────────┘
+```
+
+**Pick the host box**: the one closest to the ceiling wiring (usually the one that currently has the load wire running up to the bulbs). Install the relay there.
+
+Recommended relay: **Shelly Plus 2PM** or **Aqara Dual Relay T1** (2 switch inputs in a single module). Alternative: Shelly Plus 1 + a **Shelly i3** input-only module for the second location.
+
+Wiring changes from the existing 2-way setup:
+- **Switch 1** (host box): contact wired to relay's `SW1` input (no longer in the load path)
+- **Switch 2** (remote box): rewire so its contact feeds *back through the existing traveler wire* to the relay's `SW2` input
+- Relay output goes directly to the bulbs
+
+Both switches now behave identically — a flip of either signals the relay. You don't have to explain anything to family members; the UX looks unchanged.
+
+### Scenario 3 — Three switches → single circuit (Pasillo)
+
+This is the trickiest scenario. Three practical approaches, trade-offs in parentheses.
+
+#### Option A — Convert all three to momentary pushbuttons + one relay ⭐ (cleanest long-term)
+
+Replace all three switches with **momentary pushbuttons** (they spring back after press, like a doorbell button). Wire all three in parallel via the existing traveler wires back to the relay's `SW` input. Each press pulses the input; the relay toggles state.
+
+- Most elegant: every switch is identical, HA sees one input, no "state" on any switch
+- Needs existing 3-way wiring understood and re-routed — **recommend hiring an electrician for 1 hour** (~€50–80 in Barcelona)
+- Small aesthetic change: pushbuttons look slightly different from rocker switches (though many pushbutton plates match existing Simon/Niessen/Schneider ranges)
+
+#### Option B — Relay + wireless button on the far switch (zero wiring headache)
+
+- Install relay at one switch box (say, the box nearest the Pasillo light junction)
+- Rewire the adjacent switch via the existing traveler to the relay's `SW2` input
+- **Third switch**: leave existing wiring, disable it by capping one wire inside the box, and stick an **Aqara Mini Switch** (~€15, battery, Zigbee) to the wall next to or over it
+- HA automation: Aqara button press → call `switch.toggle` on the relay
+
+Trade-off: you have a battery-powered button on the wall that needs a CR2032 every 1–2 years. But zero cutting into walls.
+
+#### Option C — Two relays linked in HA
+
+- One relay behind each of two of the three switch boxes
+- Only one relay is wired as the actual load controller (the other in detached mode)
+- HA watches both relays' SW inputs; any input toggles the load relay
+- Wasteful (2–3 × €20 relays instead of 1), but no wiring gymnastics between boxes
+
+For the pasillo specifically, **Option A is the right answer when the time comes**. The pasillo is the single piece of this rollout where paying an electrician for one focused hour is the right call.
+
+### Practical advice before starting any of this
+
+1. **Open one multi-switch box first (breaker off) before buying anything.** You'll learn in 5 minutes: number of conductors in the box, whether neutral is present, how the travelers are laid out, how much physical space the relay will have.
+2. **Do the Living Room pilot first.** Single switch, single circuit — lets you practice the wiring pattern on the lowest-stakes install.
+3. **Then kitchen (2-way) before pasillo (3-way).** Each step teaches you something you'll want to know for the next.
+4. **For the pasillo, just budget for the electrician.** €60 once vs. several evenings cursing at wire nuts in a narrow hallway.
+5. **Take photos of every existing wiring state before changing anything.** Tag the wires with masking tape and a sharpie.
+6. **Pre-test each relay on a workbench** (or the kitchen table) before installing. Wire it to a lamp, pair it to ZHA, toggle it from HA. Confirms it works before you're inside a wall.
