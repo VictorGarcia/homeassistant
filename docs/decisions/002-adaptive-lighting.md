@@ -37,13 +37,15 @@ Delete all three enforce-temperature automations. The state the automations were
 
 | Setting | Value | Rationale |
 |---|---|---|
-| `min_color_temp` | 2200K | Warmer than the old `2700K` — more cozy at evening |
+| `min_color_temp` | **2700K** | The EG-BWGU105W001 bulbs have a hardware floor of 2700K — requesting below that produces a feedback loop where the bulb clamps to 2700K, AL sees "bulb CT ≠ requested CT," and flags it as a non-HA change, pausing adaptation. Set to the true hardware minimum. |
 | `max_color_temp` | 5500K | Cooler than the old `5000K` — more alert at midday |
 | `initial_transition` | 1s | **Load-bearing for the wall-switch pattern** (see [ADR-003](003-wall-switch-pattern.md)). A bulb coming back from power-off snaps to the correct CT within 1s. |
 | `transition` | 45s | Smooth continuous drift; no visible jumps |
 | `sunrise_offset` / `sunset_offset` | ±30 min | Pushes the curve extremes further from the horizon; less harsh edges |
 | `send_split_delay` | 128ms | Empirical: Tuya firmware doesn't like back-to-back commands to the same bulb |
-| `take_over_control` | `true` | If the user manually sets CT/brightness, AL backs off until the bulb is cycled |
+| `take_over_control` | `true` | If the user manually sets CT/brightness, AL backs off until override expires |
+| `take_over_control_mode` | `pause_all` (default) | When override detected, pause the whole zone |
+| `autoreset_control_seconds` | **900** (15 min) | Manual overrides auto-expire after 15 minutes, so AL resumes control without requiring a light cycle. Without this, once a "manual control" flag is set (including spurious ones during migrations or startup races), AL stays paused forever. |
 | `detect_non_ha_changes` | `true` | Catches changes made via the Smart Life app or physical remotes |
 | `sleep_color_temp` / `sleep_brightness` | 1900K / 1% | For night scenes via `switch.adaptive_lighting_sleep_mode_<zone>` |
 
@@ -84,3 +86,24 @@ Delete all three enforce-temperature automations. The state the automations were
 - https://github.com/basnijholt/adaptive-lighting
 - [ADR-001](001-localtuya-xzetsubou.md) — LocalTuya migration (prerequisite for this decision to be useful)
 - [ADR-003](003-wall-switch-pattern.md) — wall-switch workflow (defines `initial_transition`)
+
+## Troubleshooting — "AL isn't adapting"
+
+If `switch.adaptive_lighting_<zone>.state = on` and its `color_temp_kelvin` / `brightness_pct` attributes show the right target, but the bulbs stay at stale values:
+
+1. Check `switch.adaptive_lighting_<zone>.attributes.manual_control` — if it contains any entity IDs, AL thinks those lights were manually overridden. Clear via the service:
+   ```bash
+   curl -X POST -H "Authorization: Bearer $HA_TOKEN" -H "Content-Type: application/json" \
+     -d '{"entity_id":"switch.adaptive_lighting_<zone>","manual_control":false}' \
+     http://192.168.0.52:8123/api/services/adaptive_lighting/set_manual_control
+   ```
+2. Force an immediate adapt to confirm the command path works:
+   ```bash
+   curl -X POST -H "Authorization: Bearer $HA_TOKEN" -H "Content-Type: application/json" \
+     -d '{"entity_id":"switch.adaptive_lighting_<zone>","transition":3,"turn_on_lights":true}' \
+     http://192.168.0.52:8123/api/services/adaptive_lighting/apply
+   ```
+3. If the bulbs respond to #2 but revert within a few minutes, the feedback loop is on. Common causes:
+   - `min_color_temp` is *below* the bulbs' hardware floor — AL requests an unreachable CT, bulb clamps, AL sees drift, flags "manual," pauses.
+   - Bulbs have drifted due to a wall-switch cycle during which AL's last-known state became stale.
+4. If `autoreset_control_seconds` is `0`, manual flags never clear on their own. Set it to `900` (15 min) so recoverable bugs recover.

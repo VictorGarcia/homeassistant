@@ -56,7 +56,7 @@ Key settings (identical across zones):
 
 | Option | Value | Why |
 |---|---|---|
-| `min_color_temp` | 2200K | Warm floor (evening) |
+| `min_color_temp` | 2700K | Matches the EG-BWGU105W001 hardware floor — setting below this creates a clamp-detection feedback loop (see [ADR-002](decisions/002-adaptive-lighting.md) troubleshooting) |
 | `max_color_temp` | 5500K | Cool ceiling (midday) |
 | `initial_transition` | `1s` | Bulbs boot to hardware default after wall switch — apply correct CT within 1s |
 | `transition` | `45s` | Smooth drift during normal operation |
@@ -64,6 +64,7 @@ Key settings (identical across zones):
 | `sunrise_offset` | `+30min` | Soften the morning edge |
 | `sunset_offset` | `−30min` | Soften the evening edge |
 | `take_over_control` | `true` | Back off if user manually adjusts |
+| `autoreset_control_seconds` | 900 | Manual-override flags auto-clear after 15 min so AL self-heals from spurious detections (migration races, startup drift, brief glitches) |
 | `detect_non_ha_changes` | `true` | Catch changes from Smart Life app or other paths |
 | `sleep_color_temp` | 1900K | For bedtime via `switch.adaptive_lighting_sleep_mode_*` |
 | `sleep_brightness` | 1% | Same |
