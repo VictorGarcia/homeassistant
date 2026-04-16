@@ -1,0 +1,44 @@
+# Aggressive allowlist approach: ignore everything, then whitelist.
+# This protects against accidental commits of secrets, SD-card state,
+# recorder DB dumps, .storage/ tokens, HACS custom_components, etc.
+
+# Default: ignore everything.
+*
+
+# Whitelist directories we traverse.
+!/.gitignore
+!/.gitattributes
+!/README.md
+!/docs/
+!/docs/**
+!/config/
+!/config/**
+!/scripts/
+!/scripts/**
+
+# Never track — even if accidentally placed under config/
+config/secrets.yaml
+config/*.db
+config/*.db-shm
+config/*.db-wal
+config/*.log
+config/*.log.*
+config/.storage/
+config/.cloud/
+config/custom_components/
+config/deps/
+config/tts/
+config/image/
+config/home-assistant.log*
+config/.HA_VERSION
+config/.ha_run.lock
+
+# macOS cruft
+.DS_Store
+._*
+
+# Editor cruft
+.vscode/
+.idea/
+*.swp
+*~
