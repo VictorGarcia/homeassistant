@@ -57,6 +57,7 @@ For conventions, secret-hygiene checks, and ADR/runbook templates, see [CONTRIBU
 | Recover from an SD-card failure | [docs/runbooks/recover-from-sd-death.md](docs/runbooks/recover-from-sd-death.md) |
 | Understand the backup strategy | [docs/runbooks/backup-strategy.md](docs/runbooks/backup-strategy.md) |
 | Know why LocalTuya, not cloud | [docs/decisions/001-localtuya-xzetsubou.md](docs/decisions/001-localtuya-xzetsubou.md) |
+| Plan the smart-switch rollout | [docs/decisions/004-smart-switches.md](docs/decisions/004-smart-switches.md) |
 | See what the door-alert automation does | [docs/automations/front-door-alerts-away.md](docs/automations/front-door-alerts-away.md) |
 
 ## Access
