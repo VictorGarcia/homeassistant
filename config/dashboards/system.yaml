@@ -1,0 +1,129 @@
+# System dashboard — diagnostics, backups, updates, batteries
+#
+# Stored on the Pi at /config/.storage/lovelace.dashboard_system.
+# Apply with: ./scripts/apply-dashboard.sh system
+#
+# Intended to be looked at infrequently — when something needs attention or
+# before a maintenance window. Hidden-ish from daily use so the Home
+# dashboard stays focused on actions.
+
+views:
+  - type: sections
+    title: System
+    path: system
+    icon: mdi:cog
+    max_columns: 4
+    dense_section_placement: true
+    sections:
+
+      # ── Backups ──
+      - type: grid
+        column_span: 2
+        cards:
+          - type: heading
+            heading: Backups
+            icon: mdi:backup-restore
+            heading_style: title
+          - type: custom:mushroom-entity-card
+            entity: sensor.backup_next_scheduled_automatic_backup
+            name: Next
+            icon: mdi:clock-outline
+            icon_color: blue
+          - type: custom:mushroom-entity-card
+            entity: sensor.backup_last_successful_automatic_backup
+            name: Last success
+            icon: mdi:check-circle-outline
+            icon_color: green
+          - type: custom:mushroom-entity-card
+            entity: sensor.backup_backup_manager_state
+            name: State
+            icon: mdi:shield-check-outline
+
+      # ── Host health ──
+      - type: grid
+        column_span: 2
+        cards:
+          - type: heading
+            heading: Host
+            icon: mdi:raspberry-pi
+            heading_style: title
+          - type: custom:mushroom-entity-card
+            entity: binary_sensor.rpi_power_status
+            name: Power supply
+            icon: mdi:power-plug
+            icon_color: >
+              {% if is_state('binary_sensor.rpi_power_status','on') %}red{% else %}green{% endif %}
+          - type: custom:mushroom-template-card
+            primary: >
+              {{ states('sensor.iphone_15_pro_battery_level') }}% ·
+              {{ states('sensor.iphone_15_pro_battery_state') }}
+            secondary: iPhone 15 Pro
+            icon: mdi:cellphone
+            icon_color: >
+              {% set b = states('sensor.iphone_15_pro_battery_level') | float(0) %}
+              {% if b < 20 %}red
+              {% elif b < 50 %}orange
+              {% else %}green
+              {% endif %}
+          - type: custom:mushroom-entity-card
+            entity: device_tracker.iphone_15_pro
+            name: iPhone location
+            icon: mdi:map-marker
+
+      # ── Sensor batteries ──
+      - type: grid
+        column_span: 2
+        cards:
+          - type: heading
+            heading: Sensor batteries
+            icon: mdi:battery-70
+            heading_style: title
+          - type: entities
+            show_header_toggle: false
+            entities:
+              - entity: sensor.outdoor_battery
+                name: Outdoor
+              - entity: sensor.living_room_battery
+                name: Living Room
+              - entity: sensor.master_bedroom_battery
+                name: Master Bedroom
+              - entity: sensor.door_battery
+                name: Door sensor
+
+      # ── Updates ──
+      - type: grid
+        column_span: 2
+        cards:
+          - type: heading
+            heading: Updates available
+            icon: mdi:update
+            heading_style: title
+          - type: entities
+            show_header_toggle: false
+            entities:
+              - update.home_assistant_core_update
+              - update.home_assistant_supervisor_update
+              - update.advanced_ssh_web_terminal_update
+              - update.cloudflared_update
+              - update.hacs_update
+              - update.local_tuya_update
+              - update.matter_server_update
+
+      # ── Firmware ──
+      - type: grid
+        column_span: 4
+        cards:
+          - type: heading
+            heading: Device firmware
+            icon: mdi:chip
+            heading_style: subtitle
+          - type: entities
+            show_header_toggle: false
+            entities:
+              - update.door_firmware
+              - update.living_light_1_firmware
+              - update.living_light_2_firmware
+              - update.living_light_3_firmware
+              - update.living_room_firmware
+              - update.master_bedroom_firmware
+              - update.outdoor_firmware

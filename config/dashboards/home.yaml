@@ -1,12 +1,11 @@
-# Home dashboard — main view
+# Home dashboard — primary, day-to-day view
 #
-# Stored on the Pi at /config/.storage/lovelace.dashboard_home (JSON).
-# This YAML is the readable source of truth in git. The `scripts/apply-dashboard.sh`
-# script converts and writes the JSON.
+# Stored on the Pi at /config/.storage/lovelace.dashboard_home.
+# Apply with: ./scripts/apply-dashboard.sh home
 #
-# Requires (all installed via HACS):
-#   - piitaya/lovelace-mushroom (plugin)    — Mushroom cards (custom:mushroom-*)
-#   - basnijholt/adaptive-lighting          — for AL switches referenced below
+# Requires (HACS):
+#   - piitaya/lovelace-mushroom (plugin) — Mushroom cards (custom:mushroom-*)
+#   - basnijholt/adaptive-lighting (integration) — AL switches
 
 views:
   - type: sections
@@ -17,10 +16,9 @@ views:
     dense_section_placement: true
     sections:
 
-      # =========================================================
-      # STATUS — at-a-glance row: weather, person, sun, alerts
-      # =========================================================
+      # ── Status (half-width) ──
       - type: grid
+        column_span: 2
         cards:
           - type: heading
             heading: Status
@@ -83,16 +81,23 @@ views:
                   entity: sensor.master_bedroom_battery
                   icon_color: red
 
+      # ── Weather forecast (half-width, same row as Status) ──
+      - type: grid
+        column_span: 2
+        cards:
+          - type: heading
+            heading: Forecast
+            icon: mdi:weather-partly-cloudy
+            heading_style: title
           - type: weather-forecast
             entity: weather.forecast_home
             forecast_type: daily
             show_forecast: true
             show_current: false
 
-      # =========================================================
-      # QUICK ACTIONS — scene-like macros
-      # =========================================================
+      # ── Quick actions (full width) ──
       - type: grid
+        column_span: 4
         cards:
           - type: heading
             heading: Quick actions
@@ -104,6 +109,7 @@ views:
             secondary: AL on, sleep off
             icon: mdi:weather-sunny
             icon_color: amber
+            grid_options: { columns: 3 }
             tap_action:
               action: perform-action
               perform_action: switch.turn_on
@@ -126,6 +132,7 @@ views:
             secondary: Dim lights
             icon: mdi:movie-open
             icon_color: purple
+            grid_options: { columns: 3 }
             tap_action:
               action: perform-action
               perform_action: light.turn_on
@@ -144,6 +151,7 @@ views:
             secondary: Sleep mode on
             icon: mdi:bed
             icon_color: indigo
+            grid_options: { columns: 3 }
             tap_action:
               action: perform-action
               perform_action: switch.turn_on
@@ -158,6 +166,7 @@ views:
             secondary: Every light
             icon: mdi:lightbulb-off-outline
             icon_color: grey
+            grid_options: { columns: 3 }
             tap_action:
               action: perform-action
               perform_action: light.turn_off
@@ -167,14 +176,11 @@ views:
                   - light.pasillo
                   - light.office_light_local
                   - light.lightstrip
-                  - light.living_light_1
-                  - light.living_light_2
-                  - light.living_light_3
+                  - light.living_room
 
-      # =========================================================
-      # LIVING ROOM
-      # =========================================================
+      # ── Living Room (half-width) ──
       - type: grid
+        column_span: 2
         cards:
           - type: heading
             heading: Living Room
@@ -182,71 +188,37 @@ views:
             heading_style: title
 
           - type: custom:mushroom-light-card
-            entity: light.living_light_1
-            name: Bulb 1
+            entity: light.living_room
+            name: IKEA bulbs (×3)
             show_brightness_control: true
             collapsible_controls: true
-            layout: vertical
-
-          - type: custom:mushroom-light-card
-            entity: light.living_light_2
-            name: Bulb 2
-            show_brightness_control: true
-            collapsible_controls: true
-            layout: vertical
-
-          - type: custom:mushroom-light-card
-            entity: light.living_light_3
-            name: Bulb 3
-            show_brightness_control: true
-            collapsible_controls: true
-            layout: vertical
 
           - type: conditional
             conditions:
               - condition: state
-                entity: light.living_light_1
+                entity: light.living_room
                 state: unavailable
             card:
               type: custom:mushroom-template-card
               primary: Wall switch is off
-              secondary: Flip the physical switch to power the bulbs
+              secondary: Flip the wall switch to power the bulbs
               icon: mdi:toggle-switch-off-outline
               icon_color: grey
-              fill_container: false
 
-          - type: custom:mushroom-entity-card
+          - type: sensor
             entity: sensor.living_room_temperature
+            graph: line
+            detail: 1
             name: Temperature
-            icon_color: >
-              {% set t = states('sensor.living_room_temperature') | float(0) %}
-              {% if t < 18 %}blue
-              {% elif t < 24 %}green
-              {% else %}orange
-              {% endif %}
-
-          - type: custom:mushroom-entity-card
+          - type: sensor
             entity: sensor.living_room_humidity
+            graph: line
+            detail: 1
             name: Humidity
-            icon_color: >
-              {% set h = states('sensor.living_room_humidity') | float(0) %}
-              {% if h < 40 %}orange
-              {% elif h < 60 %}green
-              {% else %}blue
-              {% endif %}
 
-          - type: history-graph
-            entities:
-              - entity: sensor.living_room_temperature
-                name: Temp
-              - entity: sensor.living_room_humidity
-                name: Humidity
-            hours_to_show: 24
-
-      # =========================================================
-      # KITCHEN
-      # =========================================================
+      # ── Kitchen (half-width) ──
       - type: grid
+        column_span: 2
         cards:
           - type: heading
             heading: Kitchen
@@ -267,9 +239,6 @@ views:
             show_color_control: true
             collapsible_controls: true
 
-          - type: custom:mushroom-title-card
-            subtitle: Adaptive Lighting
-
           - type: custom:mushroom-chips-card
             alignment: start
             chips:
@@ -279,19 +248,18 @@ views:
                 icon_color: amber
               - type: entity
                 entity: switch.adaptive_lighting_adapt_color_kitchen
-                content_info: name
+                content_info: none
               - type: entity
                 entity: switch.adaptive_lighting_adapt_brightness_kitchen
-                content_info: name
+                content_info: none
               - type: entity
                 entity: switch.adaptive_lighting_sleep_mode_kitchen
-                content_info: name
+                content_info: none
                 icon_color: indigo
 
-      # =========================================================
-      # OFFICE
-      # =========================================================
+      # ── Office (half-width) ──
       - type: grid
+        column_span: 2
         cards:
           - type: heading
             heading: Office
@@ -305,9 +273,6 @@ views:
             show_color_temp_control: true
             collapsible_controls: true
 
-          - type: custom:mushroom-title-card
-            subtitle: Adaptive Lighting
-
           - type: custom:mushroom-chips-card
             alignment: start
             chips:
@@ -317,19 +282,18 @@ views:
                 icon_color: amber
               - type: entity
                 entity: switch.adaptive_lighting_adapt_color_office
-                content_info: name
+                content_info: none
               - type: entity
                 entity: switch.adaptive_lighting_adapt_brightness_office
-                content_info: name
+                content_info: none
               - type: entity
                 entity: switch.adaptive_lighting_sleep_mode_office
-                content_info: name
+                content_info: none
                 icon_color: indigo
 
-      # =========================================================
-      # PASILLO
-      # =========================================================
+      # ── Pasillo (half-width) ──
       - type: grid
+        column_span: 2
         cards:
           - type: heading
             heading: Pasillo
@@ -343,9 +307,6 @@ views:
             show_color_temp_control: true
             collapsible_controls: true
 
-          - type: custom:mushroom-title-card
-            subtitle: Adaptive Lighting
-
           - type: custom:mushroom-chips-card
             alignment: start
             chips:
@@ -355,151 +316,54 @@ views:
                 icon_color: amber
               - type: entity
                 entity: switch.adaptive_lighting_adapt_color_pasillo
-                content_info: name
+                content_info: none
               - type: entity
                 entity: switch.adaptive_lighting_adapt_brightness_pasillo
-                content_info: name
+                content_info: none
               - type: entity
                 entity: switch.adaptive_lighting_sleep_mode_pasillo
-                content_info: name
+                content_info: none
                 icon_color: indigo
 
-      # =========================================================
-      # BEDROOM
-      # =========================================================
+      # ── Bedroom (half-width) ──
       - type: grid
+        column_span: 2
         cards:
           - type: heading
             heading: Bedroom
             icon: mdi:bed
             heading_style: title
-
-          - type: custom:mushroom-entity-card
+          - type: sensor
             entity: sensor.master_bedroom_temperature
+            graph: line
+            detail: 1
             name: Temperature
-            icon_color: >
-              {% set t = states('sensor.master_bedroom_temperature') | float(0) %}
-              {% if t < 18 %}blue
-              {% elif t < 24 %}green
-              {% else %}orange
-              {% endif %}
-
-          - type: custom:mushroom-entity-card
+          - type: sensor
             entity: sensor.master_bedroom_humidity
+            graph: line
+            detail: 1
             name: Humidity
-            icon_color: >
-              {% set h = states('sensor.master_bedroom_humidity') | float(0) %}
-              {% if h < 40 %}orange
-              {% elif h < 60 %}green
-              {% else %}blue
-              {% endif %}
 
-          - type: history-graph
-            entities:
-              - entity: sensor.master_bedroom_temperature
-                name: Temp
-              - entity: sensor.master_bedroom_humidity
-                name: Humidity
-            hours_to_show: 24
-
-      # =========================================================
-      # OUTDOOR & ENTRY
-      # =========================================================
+      # ── Outdoor & Entry (half-width) ──
       - type: grid
+        column_span: 2
         cards:
           - type: heading
             heading: Outdoor & Entry
             icon: mdi:tree
             heading_style: title
-
-          - type: custom:mushroom-entity-card
+          - type: sensor
             entity: sensor.outdoor_temperature
+            graph: line
+            detail: 1
             name: Outdoor temp
-            icon_color: >
-              {% set t = states('sensor.outdoor_temperature') | float(0) %}
-              {% if t < 5 %}blue
-              {% elif t < 20 %}green
-              {% else %}orange
-              {% endif %}
-
-          - type: custom:mushroom-entity-card
+          - type: sensor
             entity: sensor.outdoor_humidity
+            graph: line
+            detail: 1
             name: Outdoor humidity
-
           - type: custom:mushroom-entity-card
             entity: binary_sensor.door_opening
             name: Front door
             icon_color: >
               {% if is_state('binary_sensor.door_opening','on') %}red{% else %}grey{% endif %}
-
-          - type: history-graph
-            entities:
-              - entity: sensor.outdoor_temperature
-                name: Outdoor temp
-              - entity: sensor.outdoor_humidity
-                name: Outdoor humidity
-            hours_to_show: 24
-
-      # =========================================================
-      # SYSTEM — less prominent, at the bottom
-      # =========================================================
-      - type: grid
-        cards:
-          - type: heading
-            heading: System
-            icon: mdi:cog-outline
-            heading_style: subtitle
-
-          - type: custom:mushroom-entity-card
-            entity: sensor.backup_next_scheduled_automatic_backup
-            name: Next backup
-            icon: mdi:backup-restore
-            icon_color: blue
-
-          - type: custom:mushroom-entity-card
-            entity: sensor.backup_last_successful_automatic_backup
-            name: Last backup
-            icon: mdi:check-circle-outline
-            icon_color: green
-
-          - type: custom:mushroom-entity-card
-            entity: binary_sensor.rpi_power_status
-            name: Pi power
-            icon: mdi:raspberry-pi
-            icon_color: >
-              {% if is_state('binary_sensor.rpi_power_status','on') %}red{% else %}green{% endif %}
-
-          - type: custom:mushroom-entity-card
-            entity: sensor.iphone_15_pro_battery_level
-            name: iPhone battery
-            icon: mdi:cellphone
-            icon_color: >
-              {% set b = states('sensor.iphone_15_pro_battery_level') | float(0) %}
-              {% if b < 20 %}red
-              {% elif b < 50 %}orange
-              {% else %}green
-              {% endif %}
-
-          - type: entities
-            title: Sensor batteries
-            show_header_toggle: false
-            entities:
-              - entity: sensor.outdoor_battery
-                name: Outdoor
-              - entity: sensor.living_room_battery
-                name: Living Room
-              - entity: sensor.master_bedroom_battery
-                name: Bedroom
-              - entity: sensor.door_battery
-                name: Door
-
-          - type: entities
-            title: Updates
-            show_header_toggle: false
-            entities:
-              - update.home_assistant_core_update
-              - update.home_assistant_supervisor_update
-              - update.advanced_ssh_web_terminal_update
-              - update.cloudflared_update
-              - update.hacs_update
-              - update.local_tuya_update
