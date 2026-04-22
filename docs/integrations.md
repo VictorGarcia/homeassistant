@@ -33,6 +33,7 @@ State as of 2026-04-16.
 | `yeelight` | Built-in | Yeelight Stripe `0x8019fb9` | Loaded | Single lightstrip |
 | `mobile_app` | Registration | iPhone 15 Pro | Loaded | |
 | `mqtt` | User | Mosquitto MQTT Broker | Loaded | **Currently unused** — broker runs, no clients. Candidate for removal if MQTT stays unused long-term. |
+| `alexa.smart_home` | YAML (configuration.yaml) | — | Loaded | Voice control via 2× Echo Dots. Self-hosted Smart Home skill backed by an AWS Lambda. Spanish locale, curated entity allowlist. See [runbooks/alexa-setup.md](runbooks/alexa-setup.md) for the full setup, [decisions/](decisions/) for the *why* of self-hosting vs Nabu Casa. |
 
 ## LocalTuya stack
 

@@ -1,1 +1,85 @@
-[]
+- id: '1776348000000'
+  alias: Front door alerts (away)
+  description: Push notification to iPhone when the front door opens or closes while
+    Victor is not at home. Escalates to critical if the door stays open for 3+ minutes.
+    Successive events on the same away-session replace the banner via the 'door-event'
+    tag.
+  triggers:
+  - trigger: state
+    entity_id: binary_sensor.door_opening
+    from: 'off'
+    to: 'on'
+    id: opened
+  - trigger: state
+    entity_id: binary_sensor.door_opening
+    from: 'on'
+    to: 'off'
+    id: closed
+  - trigger: state
+    entity_id: binary_sensor.door_opening
+    to: 'on'
+    for: 00:03:00
+    id: held_open
+  conditions:
+  - condition: not
+    conditions:
+    - condition: state
+      entity_id: person.victor
+      state: home
+  actions:
+  - choose:
+    - conditions: '{{ trigger.id == ''opened'' }}'
+      sequence:
+      - action: notify.mobile_app_iphone_15_pro
+        data:
+          title: "\U0001F6AA Front door opened"
+          message: Door opened at {{ now().strftime('%H:%M') }} while you're away
+          data:
+            push:
+              interruption-level: time-sensitive
+              sound: default
+            tag: door-event
+            url: /dashboard-home/home
+    - conditions: '{{ trigger.id == ''closed'' }}'
+      sequence:
+      - action: notify.mobile_app_iphone_15_pro
+        data:
+          title: "\U0001F512 Front door closed"
+          message: Door closed at {{ now().strftime('%H:%M') }}
+          data:
+            push:
+              interruption-level: active
+            tag: door-event
+            url: /dashboard-home/home
+    - conditions: '{{ trigger.id == ''held_open'' }}'
+      sequence:
+      - action: notify.mobile_app_iphone_15_pro
+        data:
+          title: ⚠️ Front door still open
+          message: Door has been open for 3 minutes and you're away
+          data:
+            push:
+              interruption-level: critical
+              sound:
+                name: default
+                critical: 1
+                volume: 1.0
+            tag: door-event-critical
+            url: /dashboard-home/home
+  mode: queued
+  max: 10
+- id: '1776560000000'
+  alias: Living Room wall switch toggles lights
+  description: Wall switch is decoupled from the ZBMINI relay via detach_relay mode.
+    Each flip of the wall switch changes binary_sensor.sonoff_living_opening; we react
+    by toggling light.living_room. IKEA bulbs stay always-powered so Adaptive Lighting
+    / HA retain full control.
+  triggers:
+  - trigger: state
+    entity_id: binary_sensor.sonoff_living_opening
+  conditions: []
+  actions:
+  - action: light.toggle
+    target:
+      entity_id: light.living_room
+  mode: single

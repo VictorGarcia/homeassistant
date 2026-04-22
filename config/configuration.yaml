@@ -15,3 +15,36 @@ http:
   trusted_proxies:
     - 172.30.33.0/24
     - 127.0.0.1
+
+
+# Alexa Smart Home skill — curated entity allowlist with Spanish voice names.
+alexa:
+  smart_home:
+    locale: es-ES
+    filter:
+      include_entities:
+        - light.living_room
+        - light.kitchen_light
+        - light.pasillo
+        - light.office_light_local
+        - light.lightstrip
+        - switch.adaptive_lighting_kitchen
+        - switch.adaptive_lighting_pasillo
+        - switch.adaptive_lighting_office
+    entity_config:
+      light.living_room:
+        name: Salón
+      light.kitchen_light:
+        name: Cocina
+      light.pasillo:
+        name: Pasillo
+      light.office_light_local:
+        name: Oficina
+      light.lightstrip:
+        name: Tira de cocina
+      switch.adaptive_lighting_kitchen:
+        name: Adaptativo cocina
+      switch.adaptive_lighting_pasillo:
+        name: Adaptativo pasillo
+      switch.adaptive_lighting_office:
+        name: Adaptativo oficina
