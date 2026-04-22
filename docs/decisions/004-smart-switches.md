@@ -1,7 +1,7 @@
 # ADR-004 — Smart switch strategy (future rollout)
 
-- **Date**: 2026-04-16
-- **Status**: Proposed (not yet implemented)
+- **Date**: 2026-04-16 (proposed), Living Room pilot completed 2026-04-22
+- **Status**: Phase 1 complete (Living Room); Phases 2–3 pending
 
 ## Context
 
@@ -72,18 +72,22 @@ Phased, not big-bang. Pilot → validate → scale.
 2. **Confirm neutral wire in switch boxes.** Flip the breaker, open one plate, look for a blue wire tied off in the box (not connected to the switch). Spanish flats built in the last ~30 years almost always have neutral. If the flat doesn't, use the **Aqara T1-N** or **Sonoff ZBMINI-L2** variants which tolerate no-neutral, ~€5–10 more per unit.
 3. **Review HA-down fallback strategy.** Decide per-room: should a switch still work when HA is offline? Default: yes, via the relay's built-in local toggle mode. Some relays can also be configured to fall back automatically after N minutes of HA unreachability.
 
-### Phase 1 — Pilot: Living Room (€45–55)
+### Phase 1 — Pilot: Living Room ✅ completed 2026-04-22
 
-- 1× Zigbee coordinator upgrade (Phase 0)
-- 1× Aqara T1 relay installed behind the existing living-room switch
-- Configure in **decoupled mode** — relay's load output is permanently on, IKEA bulbs stay always-powered
-- Wire the existing dumb switch to SW1 as an input (single tap = toggle group, long press = scene)
-- Validate for 2–4 weeks: family acceptance, no weird edge cases, fallback tested by intentionally killing HA
+What actually happened (differences from original plan noted):
 
-Living Room is the right pilot because:
-- Highest pain point today (bulbs always `unavailable` on the dashboard)
-- Single-circuit, single-switch — simplest possible install
-- Zigbee bulbs + Zigbee relay share the mesh — validates the new coordinator under realistic load
+- **Coordinator**: still on CC2531 — upgrade deferred until scaling to Phase 2. One added device doesn't stress the old coordinator.
+- **Relay**: **SONOFF ZBMINI-L2** (not Aqara T1 as originally planned). Discovered during wire-tracing that the flat's electrical install doesn't carry neutral to switch boxes — neutrals only spliced in the registry box. No-neutral variant was the pragmatic choice; avoided pulling new wires.
+- **Wiring topology**: 2-way (2 wall switches controlling the Living Room circuit). Wired as described in [Appendix A](#appendix-a--multi-switch-wiring-cookbook). The L2's single-circuit 2-input design was a natural fit.
+- **Decoupled mode configured** via `switch.sonoff_living_detach_relay`. Relay permanently closed → IKEA bulbs always powered. Wall switches now signal HA via `binary_sensor.sonoff_living_opening`.
+- **Automation**: see [docs/automations/living-room-wall-switch-toggle.md](../automations/living-room-wall-switch-toggle.md). Triggered on binary_sensor state change, calls `light.toggle` on `light.living_room`.
+
+Outcome: both wall switches toggle the IKEA TRADFRI group via HA, bulbs stay always-powered, family UX unchanged.
+
+Living Room was the right pilot because:
+- Highest pain point today (bulbs were always `unavailable` on the dashboard until this)
+- Zigbee bulbs + Zigbee relay share the mesh — validates the mesh under realistic load
+- 2-way multi-switch exercised the tricky wiring pattern end-to-end
 
 ### Phase 2 — Smart zones (€80–100)
 
