@@ -81,6 +81,18 @@ Auto-detected by xZetsubou's `auto_configure_device`. Provided here for referenc
 | `update.home_assistant_supervisor_update` | Supervisor update |
 | `update.*_firmware` | Zigbee bulb/sensor firmware |
 
+## SONOFF ZBMINIR2 (Zigbee relay, single-channel, Eric's Bedroom)
+
+Originally piloted on the Living Room circuit on 2026-04-22, repurposed on 2026-04-23 as follows:
+
+- **Location**: Eric's Bedroom switch box
+- **Mode**: **Coupled** (`switch.sonoff_eric_bedroom_detach_relay = off`) — wall switch physically toggles the relay → dumb bulb. Normal behaviour, no automation needed at the HA level.
+- **Start-up behaviour**: `PreviousValue` — on power return, the bulb restores its last state (better than defaulting to always-on for a bedroom).
+- Entity prefix: `sonoff_eric_bedroom_*`
+- IEEE: `94:b2:16:ff:fe:8c:35:fe`
+
+When device was re-installed after removal from the ZHA registry, it auto-rejoined with the same IEEE thanks to ZHA being in `permit_join` mode at power-up. No fresh pairing needed.
+
 ## SONOFF MINI-ZB2GS (Zigbee relay, dual-channel)
 
 Controls two independent circuits in the Salón/Comedor switch box:

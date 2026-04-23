@@ -76,13 +76,14 @@ The household normally controls lights using physical wall switches, which cut p
 
 See [decisions/003-wall-switch-pattern.md](decisions/003-wall-switch-pattern.md).
 
-## Areas (6)
+## Areas (7)
 
 | Area | Devices |
 |---|---|
-| Living Room | 3 IKEA TRADFRI bulbs + Aqara HT sensor |
+| Living Room | 3 IKEA TRADFRI bulbs + Aqara HT sensor + MINI-ZB2GS channel 2 |
 | Kitchen | 3 Tuya bulbs + Yeelight Lightstrip |
-| Bedroom | Aqara HT sensor |
+| Bedroom | Aqara HT sensor (Master Bedroom) |
+| Eric's Bedroom | SONOFF ZBMINIR2 (drives the dumb bulb in coupled mode) |
 | Outdoor | Aqara HT sensor |
 | Lobby | Aqara door/magnet sensor |
 | Office | 1 Tuya bulb |
