@@ -52,5 +52,7 @@ alexa:
         name: Adaptativo oficina
       switch.sonoff_salon_comedor_switch:
         name: Comedor
+        display_categories: LIGHT
       switch.sonoff_eric_bedroom:
+        display_categories: LIGHT
         name: Habitación de Eric
