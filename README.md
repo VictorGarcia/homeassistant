@@ -61,6 +61,7 @@ For conventions, secret-hygiene checks, and ADR/runbook templates, see [CONTRIBU
 | Plan the smart-switch rollout | [docs/decisions/004-smart-switches.md](docs/decisions/004-smart-switches.md) |
 | See what the door-alert automation does | [docs/automations/front-door-alerts-away.md](docs/automations/front-door-alerts-away.md) |
 | See the wall-switch → light-toggle automation | [docs/automations/living-room-wall-switch-toggle.md](docs/automations/living-room-wall-switch-toggle.md) |
+| See the post-outage "lights off if away" safety net | [docs/automations/force-lights-off-after-ha-start.md](docs/automations/force-lights-off-after-ha-start.md) |
 
 ## Access
 

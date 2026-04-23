@@ -83,3 +83,45 @@
     target:
       entity_id: light.living_room
   mode: single
+- id: '1776700000000'
+  alias: Force lights off after HA start (away)
+  description: When HA boots (power restore, manual restart), wait for device_tracker
+    to resolve, and if person.victor isn't at home, turn off every light + both coupled-mode
+    switches. Covers Tuya / Yeelight whose firmware wakes 'on' after power loss. Also
+    notifies the iPhone so user knows.
+  triggers:
+  - trigger: homeassistant
+    event: start
+  conditions: []
+  actions:
+  - wait_template: '{{ states(''person.victor'') not in [''unknown'', ''unavailable'']
+      }}'
+    timeout: 00:05:00
+    continue_on_timeout: true
+  - condition: not
+    conditions:
+    - condition: state
+      entity_id: person.victor
+      state: home
+  - delay: 00:00:30
+  - action: homeassistant.turn_off
+    target:
+      entity_id:
+      - light.kitchen_light
+      - light.pasillo
+      - light.office_light_local
+      - light.lightstrip
+      - light.living_room
+      - switch.sonoff_salon_comedor_switch
+      - switch.sonoff_eric_bedroom
+  - action: notify.mobile_app_iphone_15_pro
+    data:
+      title: "\U0001F4A1 Power restored — lights off"
+      message: HA rebooted at {{ now().strftime('%H:%M') }} while you were away. All
+        lights turned off as a precaution.
+      data:
+        push:
+          interruption-level: active
+        tag: power-restore
+        url: /dashboard-home/home
+  mode: single
