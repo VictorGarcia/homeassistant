@@ -81,6 +81,17 @@ Auto-detected by xZetsubou's `auto_configure_device`. Provided here for referenc
 | `update.home_assistant_supervisor_update` | Supervisor update |
 | `update.*_firmware` | Zigbee bulb/sensor firmware |
 
+## SONOFF MINI-ZB2GS (Zigbee relay, dual-channel)
+
+Controls two independent circuits in the Salón/Comedor switch box:
+
+| Channel | Circuit | Mode | Notes |
+|---|---|---|---|
+| CH1 (`L1`/`S1`) | Dining Room (Comedor) dumb bulb | Coupled (normal) | Wall switch physically toggles the bulb; HA can also control via `switch.sonoff_salon_comedor_switch` |
+| CH2 (`L2`/`S2`) | Living Room (Salón) IKEA TRADFRI group | **Decoupled** (`detach_relay = "CH2 enabled"`) | Relay permanently closed; wall switches signal HA via `binary_sensor.sonoff_salon_comedor_opening_2`; see [automations/living-room-wall-switch-toggle.md](automations/living-room-wall-switch-toggle.md) |
+
+Neutral is present at the switch box (pulled from the registry box through existing conduit during the MINI-ZB2GS install — the earlier ZBMINI-L2 pilot didn't need it).
+
 ## Light groups
 
 | Group entity | Members | Why the group exists |

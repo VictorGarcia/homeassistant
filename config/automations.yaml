@@ -70,13 +70,13 @@
   max: 10
 - id: '1776560000000'
   alias: Living Room wall switch toggles lights
-  description: Wall switch is decoupled from the ZBMINI relay via detach_relay mode.
-    Each flip of the wall switch changes binary_sensor.sonoff_living_opening; we react
-    by toggling light.living_room. IKEA bulbs stay always-powered so Adaptive Lighting
-    / HA retain full control.
+  description: Wall switch is decoupled from the ZBMINI relay (channel 2 of the SONOFF
+    MINI-ZB2GS, detach_relay = 'CH2 enabled'). Each flip of the wall switch changes
+    binary_sensor.sonoff_salon_comedor_opening_2; we react by toggling light.living_room.
+    IKEA bulbs stay always-powered so Adaptive Lighting / HA retain full control.
   triggers:
   - trigger: state
-    entity_id: binary_sensor.sonoff_living_opening
+    entity_id: binary_sensor.sonoff_salon_comedor_opening_2
   conditions: []
   actions:
   - action: light.toggle

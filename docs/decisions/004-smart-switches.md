@@ -1,7 +1,7 @@
 # ADR-004 — Smart switch strategy (future rollout)
 
-- **Date**: 2026-04-16 (proposed), Living Room pilot completed 2026-04-22
-- **Status**: Phase 1 complete (Living Room); Phases 2–3 pending
+- **Date**: 2026-04-16 (proposed), Living Room pilot completed 2026-04-22, upgraded to dual-channel 2026-04-23
+- **Status**: Phase 1 complete (Living Room + Dining Room share one device); Phases 2–3 pending
 
 ## Context
 
@@ -88,6 +88,48 @@ Living Room was the right pilot because:
 - Highest pain point today (bulbs were always `unavailable` on the dashboard until this)
 - Zigbee bulbs + Zigbee relay share the mesh — validates the mesh under realistic load
 - 2-way multi-switch exercised the tricky wiring pattern end-to-end
+
+### Phase 1b — Dual-channel upgrade (2026-04-23)
+
+Extended Phase 1 to also cover the adjacent **Dining Room** dumb bulb sharing the same switch box, by replacing the single-channel ZBMINI-L2 with a dual-channel **SONOFF MINI-ZB2GS**:
+
+- Channel 2 drives the Living Room circuit in decoupled mode (same as before, now via `L2`/`S2` terminals)
+- Channel 1 drives the Dining Room circuit in coupled mode (`L1`/`S1`) — dumb bulb, wall-switch-cuts-power is the right behaviour
+- Single Zigbee device handles both, one pairing
+
+Key learnings:
+
+- The MINI-ZB2GS requires a neutral wire (unlike the L2). A new blue conductor was pulled from the registry box to the switch box through the existing conduit.
+- The MINI-ZB2GS needed **HA Core 2026.4.x** for its ZHA quirk to load. On 2026.2.3 the device paired but exposed only basic entities — `detach_relay` (the whole point) wasn't surfaced as a select. The HA Core upgrade was required; prior to upgrading, direct cluster-attribute writes to the Sonoff manufacturer cluster (`0xFC11`) failed with "unsupported attribute" on all tried IDs.
+- The DNS plugin needed explicit upstream servers (`1.1.1.1`, `8.8.8.8`) added via `supervisor/api /dns/options` to make the Core image download reliable — the Pi's only DNS source before that was the router at `192.168.0.1`, which gave intermittent "DNS server returned general failure" errors during the Docker manifest fetch.
+- Final configuration (verified working):
+
+  | Entity | Value |
+  |---|---|
+  | `select.sonoff_salon_comedor_detach_relay` | `CH2 enabled` |
+  | `switch.sonoff_salon_comedor_switch_2` | `on` (relay permanently closed → Living Room bulbs always powered) |
+  | `select.sonoff_salon_comedor_start_up_behaviour_2` | `On` (channel 2 resilient to power restore) |
+  | `select.sonoff_salon_comedor_start_up_behaviour` | `PreviousValue` (channel 1 = Dining Room — restore last state) |
+  | `select.sonoff_salon_comedor_external_trigger_mode_2` | `Edge trigger` |
+
+The old ZBMINIR2 (used during the Living Room-only pilot) became redundant and is still paired as of this write; removal pending a restart or UI removal (the ZHA WS remove command changed names between Core versions).
+
+### Migrating ZBMINIR2 → MINI-ZB2GS for channel 2 only
+
+Checklist for future similar migrations (add a dumb-bulb-circuit channel to an existing decoupled smart-bulb install in the same box):
+
+1. Verify HA Core ≥ 2026.4.x (for the MINI-ZB2GS quirk).
+2. Add explicit upstream DNS to the Supervisor (`1.1.1.1`, `8.8.8.8`) if not already set — improves image download reliability.
+3. Pull a neutral wire from the registry box to the switch box if not present (required for MINI-ZB2GS).
+4. Physically install MINI-ZB2GS in place of the ZBMINI-L2:
+   - `L In` and `N` from the registry box
+   - `L1`/`S1` to the dumb-bulb circuit (Dining Room)
+   - `L2`/`S2` to the smart-bulb circuit (Living Room, same topology as ZBMINI-L2's single channel)
+5. Pair to ZHA (press and hold button 5-10s).
+6. Rename the device and optionally the entities for readability (`Sonoff Salon Comedor` in this flat).
+7. Set `detach_relay = "CH2 enabled"`, configure start-up behaviours as above.
+8. Update any existing wall-switch automation to point at the channel-2 `binary_sensor.*_opening_2`.
+9. Remove the old ZBMINIR2 from ZHA via the UI.
 
 ### Phase 2 — Smart zones (€80–100)
 
