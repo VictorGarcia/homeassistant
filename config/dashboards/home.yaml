@@ -155,7 +155,7 @@ views:
             grid_options: { columns: 6 }
             tap_action:
               action: perform-action
-              perform_action: light.turn_off
+              perform_action: homeassistant.turn_off
               target:
                 entity_id:
                   - light.kitchen_light
@@ -163,6 +163,8 @@ views:
                   - light.office_light_local
                   - light.lightstrip
                   - light.living_room
+                  - switch.sonoff_salon_comedor_switch
+                  - switch.sonoff_eric_bedroom
 
       # ── Forecast (quarter-width, next to Quick actions) ──
       - type: grid
@@ -325,12 +327,12 @@ views:
                 content_info: none
                 icon_color: indigo
 
-      # ── Bedroom (half-width) ──
+      # ── Master Bedroom (half-width) ──
       - type: grid
         column_span: 2
         cards:
           - type: heading
-            heading: Bedroom
+            heading: Master Bedroom
             icon: mdi:bed
             heading_style: title
           - type: sensor
@@ -343,6 +345,40 @@ views:
             graph: line
             detail: 1
             name: Humidity
+
+      # ── Eric's Bedroom (half-width) ──
+      - type: grid
+        column_span: 2
+        cards:
+          - type: heading
+            heading: Eric's Bedroom
+            icon: mdi:bed-outline
+            heading_style: title
+          - type: custom:mushroom-entity-card
+            entity: switch.sonoff_eric_bedroom
+            name: Bedroom light
+            icon: mdi:ceiling-light
+            icon_color: >
+              {% if is_state('switch.sonoff_eric_bedroom','on') %}amber{% else %}grey{% endif %}
+            tap_action:
+              action: toggle
+
+      # ── Dining Room (half-width) ──
+      - type: grid
+        column_span: 2
+        cards:
+          - type: heading
+            heading: Dining Room
+            icon: mdi:silverware-variant
+            heading_style: title
+          - type: custom:mushroom-entity-card
+            entity: switch.sonoff_salon_comedor_switch
+            name: Comedor
+            icon: mdi:ceiling-light
+            icon_color: >
+              {% if is_state('switch.sonoff_salon_comedor_switch','on') %}amber{% else %}grey{% endif %}
+            tap_action:
+              action: toggle
 
       # ── Outdoor & Entry (half-width) ──
       - type: grid

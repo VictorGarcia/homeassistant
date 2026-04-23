@@ -32,6 +32,7 @@ alexa:
         - switch.adaptive_lighting_pasillo
         - switch.adaptive_lighting_office
         - switch.sonoff_salon_comedor_switch
+        - switch.sonoff_eric_bedroom
     entity_config:
       light.living_room:
         name: Salón
@@ -51,3 +52,5 @@ alexa:
         name: Adaptativo oficina
       switch.sonoff_salon_comedor_switch:
         name: Comedor
+      switch.sonoff_eric_bedroom:
+        name: Habitación de Eric
