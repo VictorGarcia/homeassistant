@@ -29,7 +29,7 @@ Barcelona, Spain. `Europe/Madrid` timezone. `EUR` currency. `km`/`°C`/`m/s` uni
 
 | Protocol | Integration | Devices |
 |---|---|---|
-| Zigbee (ZHA) | Built-in | 1 coordinator + 4 Aqara/LUMI sensors + 3 IKEA TRADFRI bulbs |
+| Zigbee (ZHA) | Built-in | 1 coordinator + 4 Aqara/LUMI sensors + 3 IKEA TRADFRI bulbs + 3 SONOFF relays/shutter (MINI-ZB2GS, ZBMINIR2, MINI-ZBRBS) |
 | Tuya local (v3.5) | `xZetsubou/hass-localtuya` (HACS) | 6 EG-BWGU105W001 WiFi bulbs |
 | Yeelight | Built-in | 1 Lightstrip |
 | Mobile App | Built-in | 1 iPhone 15 Pro |
@@ -84,6 +84,7 @@ See [decisions/003-wall-switch-pattern.md](decisions/003-wall-switch-pattern.md)
 | Kitchen | 3 Tuya bulbs + Yeelight Lightstrip |
 | Bedroom | Aqara HT sensor (Master Bedroom) |
 | Eric's Bedroom | SONOFF ZBMINIR2 (drives the dumb bulb in coupled mode) |
+| Claudia's Bedroom | SONOFF MINI-ZBRBS (motorised roller blind) |
 | Outdoor | Aqara HT sensor |
 | Lobby | Aqara door/magnet sensor |
 | Office | 1 Tuya bulb |

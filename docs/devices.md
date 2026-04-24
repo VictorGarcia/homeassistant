@@ -1,6 +1,6 @@
 # Device Inventory
 
-Snapshot date: 2026-04-16. Update after any physical change.
+Snapshot date: 2026-04-24. Update after any physical change.
 
 ## Tuya WiFi bulbs (LocalTuya, protocol v3.5)
 
@@ -103,6 +103,19 @@ Controls two independent circuits in the Salón/Comedor switch box:
 | CH2 (`L2`/`S2`) | Living Room (Salón) IKEA TRADFRI group | **Decoupled** (`detach_relay = "CH2 enabled"`) | Relay permanently closed; wall switches signal HA via `binary_sensor.sonoff_salon_comedor_opening_2`; see [automations/living-room-wall-switch-toggle.md](automations/living-room-wall-switch-toggle.md) |
 
 Neutral is present at the switch box (pulled from the registry box through existing conduit during the MINI-ZB2GS install — the earlier ZBMINI-L2 pilot didn't need it).
+
+## SONOFF MINI-ZBRBS (Zigbee roller-shutter controller, Claudia's Bedroom)
+
+Installed 2026-04-24 behind the JUNG Auf/Zu pushbutton in Claudia's Bedroom to motorise the existing roller blind.
+
+- **Entity**: `cover.persiana_claudia` (+ `sensor.*_calibrated`, `switch.*_inverted`, `select.*_external_trigger_mode`, `button.*_configure_cover_limits`)
+- **Area**: Claudia's Bedroom
+- **IEEE**: `04:e3:e5:ff:fe:a2:f6:88`
+- **Quirk**: `zigpy.quirks.v2.CustomDeviceV2` (auto-applied on pairing; no eWeLink app required)
+- **External trigger mode**: `edge trigger` — correct for JUNG momentary pushbuttons
+- **Inverted**: `off` — Open moves the blind up
+- **Calibration**: done via `button.persiana_claudia_configure_cover_limits`; persists on-device through reboots. Sensor `sensor.persiana_claudia_calibrated` reports status (`calibrated` / `not_calibrated`).
+- **Wiring**: L → live from lighting circuit, N → neutral pulled from registry box, Lout1/Lout2 → motor up/down, S1/S2 → JUNG Auf/Zu outputs
 
 ## Light groups
 
